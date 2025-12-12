@@ -1,0 +1,7 @@
+[
+  { "offer_id": "OFF001", "customer_id": "C001", "amount": 150000, "tenure_months": 36, "apr": 13.5, "preapproved": true },
+  { "offer_id": "OFF002", "customer_id": "C002", "amount": 80000, "tenure_months": 24, "apr": 15.2, "preapproved": true },
+  { "offer_id": "OFF003", "customer_id": "C003", "amount": 250000, "tenure_months": 48, "apr": 12.9, "preapproved": true },
+  { "offer_id": "OFF004", "customer_id": "C004", "amount": 200000, "tenure_months": 60, "apr": 13, "preapproved": true },
+  { "offer_id": "OFF005", "customer_id": "C005", "amount": 350000, "tenure_months": 72, "apr": 15, "preapproved": true }
+]
