@@ -1,21 +1,12 @@
-from orchestrator.workflow import LoanWorkflowOrchestrator
+# main.py
 
-def main():
-    orchestrator = LoanWorkflowOrchestrator()
-
-    print("\n=== NBFC Loan Assistant ===\n")
-
-    while True:
-        user_input = input("You: ")
-
-        if user_input.lower() in ["exit", "quit"]:
-            print("Goodbye!")
-            break
-
-        response = orchestrator.handle_user_message(user_input)
-        print("\nAssistant:", response, "\n")
-
+from agents.sales_agent import sales_agent_task
 
 if __name__ == "__main__":
-    main()
+    customer_id = input("Enter customer ID: ")
+    result = sales_agent_task(customer_id)
+    print("Best offer:", result)
+
+
+
 
