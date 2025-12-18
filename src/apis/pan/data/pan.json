@@ -1,0 +1,37 @@
+[
+  {
+    "pan": "ABCDE1234F",
+    "name": "Sai Spandana",
+    "dob": "2003-05-14",
+    "status": "ACTIVE",
+    "pan_type": "INDIVIDUAL"
+  },
+  {
+    "pan": "PQRSX9876K",
+    "name": "Sai Sathvika",
+    "dob": "1998-08-21",
+    "status": "ACTIVE",
+    "pan_type": "INDIVIDUAL"
+  },
+  {
+    "pan": "LMNOP4567Q",
+    "name": "Sai Rajani",
+    "dob": "1995-02-10",
+    "status": "ACTIVE",
+    "pan_type": "INDIVIDUAL"
+  },
+  {
+    "pan": "AAAAA0000Z",
+    "name": "Fraud User",
+    "dob": "1990-01-01",
+    "status": "BLOCKED",
+    "pan_type": "INDIVIDUAL"
+  },
+  {
+    "pan": "BBBBB1111C",
+    "name": "Dormant Account",
+    "dob": "1987-07-19",
+    "status": "INACTIVE",
+    "pan_type": "INDIVIDUAL"
+  }
+]
