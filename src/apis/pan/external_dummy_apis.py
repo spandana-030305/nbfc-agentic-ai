@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from .models import PANRequest, PANResponse
+from .models import BankStatementRequest, BankStatementResponse
 from pathlib import Path
 import json
 import re
@@ -9,6 +10,9 @@ app = FastAPI(title="Dummy PAN Verification API", version="1.0")
 # Load PAN data once at startup
 with open("apis/pan/data/pan.json", "r") as f:
     PAN_DB = json.load(f)
+
+with open("apis/pan/data/bank_statements.json", "r") as f:
+    BANK_DB = json.load(f)
 
 PAN_REGEX = r"^[A-Z]{5}[0-9]{4}[A-Z]$"
 
@@ -55,3 +59,24 @@ def verify_pan(data: PANRequest):
             status="VERIFIED",
             message="PAN verified successfully"
         )
+    
+    
+@app.post("/bank-statements/fetch", response_model=BankStatementResponse)
+def fetch_bank_statements(data: BankStatementRequest):
+
+    record = BANK_DB.get(data.customer_id)
+
+    if not record:
+        return BankStatementResponse(
+            monthly_income=0,
+            emi_amount=0,
+            avg_balance=0,
+            transactions=[]
+        )
+
+    return BankStatementResponse(
+        monthly_income=record["monthly_income"],
+        emi_amount=record["emi_amount"],
+        avg_balance=record["avg_balance"],
+        transactions=record["transactions"]
+    )
