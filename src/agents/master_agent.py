@@ -16,6 +16,14 @@ def kyc_agent_tool(pan: str, name: str, dob: str) -> str:
     result = kyc_agent_task(pan=pan, name=name, dob=dob)
     return f"KYC Result: {result}"
 
+@tool
+def income_agent_tool(customer_id: str) -> str:
+    """
+    Perform income verification using bank statements.
+    """
+    from agents.income_agent import income_agent_task
+    result = income_agent_task(customer_id)
+    return f"Income Verification Result: {result}"
 
 @tool
 def sales_agent_tool(customer_id: str) -> str:
@@ -40,9 +48,11 @@ class MasterAgent:
         )
 
         self.kyc_status = None
+        self.income_status = None
 
         tools = [
-            kyc_agent_tool,     
+            kyc_agent_tool,
+            income_agent_tool,     
             sales_agent_tool    
         ]
 
@@ -65,18 +75,30 @@ class MasterAgent:
         # Capture KYC result
         # ----------------------------
         for msg in result["messages"]:
-            if isinstance(msg.content, str) and "KYC Result" in msg.content:
+            if not isinstance(msg.content, str):
+                continue
+
+            if "KYC Result" in msg.content:
                 if "'kyc_status': 'VERIFIED'" in msg.content:
                     self.kyc_status = "VERIFIED"
                 elif "'kyc_status': 'FAILED'" in msg.content:
                     self.kyc_status = "FAILED"
+
+            if "Income Verification Result" in msg.content:
+                if "'income_status': 'VERIFIED'" in msg.content:
+                    self.income_status = "VERIFIED"
+                elif "'income_status': 'FAILED'" in msg.content:
+                    self.income_status = "FAILED"
 
         # ----------------------------
         # HARD COMPLIANCE GATE
         # ----------------------------
         if "loan" in user_message.lower():
             if self.kyc_status != "VERIFIED":
-                return "Loan offers cannot be provided as KYC verification failed."
+                return "Loan cannot be processed because KYC verification failed."
+
+            if self.income_status != "VERIFIED":
+                return "Loan cannot be processed because income eligibility failed."
 
         return result["messages"][-1].content
 

@@ -18,8 +18,23 @@ print("KYC Response:")
 print(kyc_response)
 
 customer_id = input("\nEnter customer ID: ")
+
 # -------------------------
-# Prompt 2: Sales (after KYC)
+# Prompt 2: Income Verification
+# -------------------------
+customer_id = input("\nEnter customer ID: ")
+
+income_prompt = f"""
+Verify income eligibility for customer {customer_id}
+by fetching bank statements.
+"""
+
+income_response = agent.run(income_prompt)
+print("\nIncome Verification Response:")
+print(income_response)
+
+# -------------------------
+# Prompt 3: Sales (after KYC)
 # -------------------------
 sales_prompt = f"""
 KYC is completed. Now fetch loan offers for customer {customer_id}.

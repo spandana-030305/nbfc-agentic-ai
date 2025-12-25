@@ -1,7 +1,7 @@
 from autogen_agentchat.agents import UserProxyAgent
 import requests
 
-PAN_API_URL = "http://127.0.0.1:8000/pan/verify"
+PAN_API_URL = "http://localhost:8002/pan/verify"
 
 
 class KYCAgent(UserProxyAgent):
