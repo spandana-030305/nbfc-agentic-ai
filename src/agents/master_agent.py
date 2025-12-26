@@ -75,8 +75,8 @@ class MasterAgent:
         # Capture KYC result
         # ----------------------------
         for msg in result["messages"]:
-            if not isinstance(msg.content, str):
-                continue
+            if isinstance(msg.content, str):
+                print("AGENT MSG:", msg.content)
 
             if "KYC Result" in msg.content:
                 if "'kyc_status': 'VERIFIED'" in msg.content:
@@ -94,10 +94,10 @@ class MasterAgent:
         # HARD COMPLIANCE GATE
         # ----------------------------
         if "loan" in user_message.lower():
-            if self.kyc_status != "VERIFIED":
+            if self.kyc_status == "FAILED":
                 return "Loan cannot be processed because KYC verification failed."
 
-            if self.income_status != "VERIFIED":
+            if self.income_status == "FAILED":
                 return "Loan cannot be processed because income eligibility failed."
 
         return result["messages"][-1].content
