@@ -5,13 +5,13 @@ from pathlib import Path
 import json
 import re
 
-app = FastAPI(title="Dummy PAN Verification API", version="1.0")
+app = FastAPI(title="Dummy external services API", version="1.0")
 
 # Load PAN data once at startup
-with open("apis/pan/data/pan.json", "r") as f:
+with open("apis/external/data/pan.json", "r") as f:
     PAN_DB = json.load(f)
 
-with open("apis/pan/data/bank_statements.json", "r") as f:
+with open("apis/external/data/bank_statements.json", "r") as f:
     BANK_DB = json.load(f)
 
 PAN_REGEX = r"^[A-Z]{5}[0-9]{4}[A-Z]$"

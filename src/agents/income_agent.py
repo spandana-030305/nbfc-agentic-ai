@@ -23,6 +23,14 @@ class IncomeVerificationAgent(UserProxyAgent):
         emi_amount = record["emi_amount"]
         avg_balance = record["avg_balance"]
 
+        # Prevent division by zero
+        if monthly_income <= 0:
+            return {
+                "income_status": "FAILED",
+                "emi_ratio": None,
+                "remarks": "Monthly income is 0 or invalid, cannot verify income"
+            }
+
         emi_ratio = emi_amount / monthly_income
 
         # Business rules
