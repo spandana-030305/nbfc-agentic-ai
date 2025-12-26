@@ -1,0 +1,91 @@
+{
+  "C001": {
+    "monthly_income": 60000,
+    "emi_amount": 15000,
+    "avg_balance": 18000,
+    "transactions": [
+      {
+        "date": "2024-11-01",
+        "amount": 60000,
+        "description": "SALARY CREDIT"
+      },
+      {
+        "date": "2024-11-05",
+        "amount": -15000,
+        "description": "HDFC LOAN EMI"
+      }
+    ]
+  },
+
+  "C002": {
+    "monthly_income": 45000,
+    "emi_amount": 12000,
+    "avg_balance": 14000,
+    "transactions": [
+      {
+        "date": "2024-11-01",
+        "amount": 45000,
+        "description": "SALARY CREDIT"
+      },
+      {
+        "date": "2024-11-07",
+        "amount": -12000,
+        "description": "PERSONAL LOAN EMI"
+      }
+    ]
+  },
+
+  "C003": {
+    "monthly_income": 80000,
+    "emi_amount": 20000,
+    "avg_balance": 30000,
+    "transactions": [
+      {
+        "date": "2024-11-01",
+        "amount": 80000,
+        "description": "SALARY CREDIT"
+      },
+      {
+        "date": "2024-11-06",
+        "amount": -20000,
+        "description": "HOME LOAN EMI"
+      }
+    ]
+  },
+
+  "C004": {
+    "monthly_income": 35000,
+    "emi_amount": 10000,
+    "avg_balance": 9000,
+    "transactions": [
+      {
+        "date": "2024-11-01",
+        "amount": 35000,
+        "description": "SALARY CREDIT"
+      },
+      {
+        "date": "2024-11-10",
+        "amount": -10000,
+        "description": "TWO WHEELER LOAN EMI"
+      }
+    ]
+  },
+
+  "C005": {
+    "monthly_income": 100000,
+    "emi_amount": 25000,
+    "avg_balance": 45000,
+    "transactions": [
+      {
+        "date": "2024-11-01",
+        "amount": 100000,
+        "description": "SALARY CREDIT"
+      },
+      {
+        "date": "2024-11-03",
+        "amount": -25000,
+        "description": "CAR LOAN EMI"
+      }
+    ]
+  }
+}
