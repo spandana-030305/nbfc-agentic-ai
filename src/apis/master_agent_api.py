@@ -11,4 +11,4 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat")
 def chat(req: ChatRequest):
-    return {"response": agent.run(req.message)}
+    return {"reply": agent.run(req.message)}

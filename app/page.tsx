@@ -2,62 +2,75 @@
 
 import { useEffect, useRef, useState } from "react";
 
+type ChatMessage = { role: "user" | "bot"; content: string };
+
 export default function Home() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
-  const fileInputRef = useRef(null);
-  const chatEndRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Smooth scroll to bottom
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(scrollToBottom, [messages, typing]);
 
-  // Send text message to API
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input;
+    setMessages(prev => [...prev, { role: "user", content: currentInput }]);
     setInput("");
-
     setTyping(true);
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      body: JSON.stringify({ message: input }),
-    });
+    try {
+      const res = await fetch("http://127.0.0.1:9000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: currentInput }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
+      setTyping(false);
 
-    setTyping(false);
-    setMessages((prev) => [...prev, { role: "bot", content: data.reply }]);
+      setMessages(prev => [
+        ...prev,
+        { role: "bot", content: data.reply || "⚠ Invalid response from gateway!" },
+      ]);
+    } catch {
+      setTyping(false);
+      setMessages(prev => [...prev, { role: "bot", content: "⚠ Gateway not reachable!" }]);
+    }
   };
 
-  // File upload handler
-  const uploadFile = async (file) => {
+  const uploadFile = async (file: File) => {
+    if (!file) return;
+
     const form = new FormData();
     form.append("file", file);
 
-    const userMessage = {
-      role: "user",
-      content: `📎 Uploaded: ${file.name}`,
-    };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, { role: "user", content: `📎 Uploaded: ${file.name}` }]);
     setTyping(true);
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      body: form,
-    });
+    try {
+      const res = await fetch("http://127.0.0.1:9000/chat", {
+        method: "POST",
+        body: form,
+      });
 
-    const data = await res.json();
-    setTyping(false);
+      const data = await res.json();
+      setTyping(false);
 
-    setMessages((prev) => [...prev, { role: "bot", content: data.reply }]);
+      setMessages(prev => [
+        ...prev,
+        { role: "bot", content: data.reply || "⚠ File processed, but no reply from gateway!" },
+      ]);
+    } catch {
+      setTyping(false);
+      setMessages(prev => [...prev, { role: "bot", content: "⚠ File upload failed!" }]);
+    }
   };
 
   return (
@@ -73,209 +86,180 @@ export default function Home() {
       <div
         style={{
           width: "100%",
-          maxWidth: "480px",
+          maxWidth: "520px",
           background: "white",
           borderRadius: "25px",
-          padding: "25px",
+          padding: "24px",
           boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
           display: "flex",
           flexDirection: "column",
           height: "80vh",
         }}
       >
-        {/* Header */}
-        <h2
-          style={{
-            fontSize: "22px",
-            fontWeight: "700",
-            marginBottom: "4px",
-            color: "#222",
-          }}
-        >
+        <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: 4, color: "#222" }}>
           NBFC Chatbot
         </h2>
-        <p style={{ color: "#666", marginBottom: "15px" }}>We’re online…</p>
+        <p style={{ color: "#666", marginBottom: 16 }}>We’re online…</p>
 
-        {/* Chat Window */}
+        {/* CHAT AREA */}
         <div
           style={{
             flexGrow: 1,
             overflowY: "auto",
-            paddingRight: "10px",
+            paddingRight: 4,
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
           }}
         >
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                marginBottom: "15px",
-                justifyContent:
-                  msg.role === "user" ? "flex-end" : "flex-start",
-              }}
-            >
-              {/* Avatar */}
-              {msg.role === "bot" && (
-                <div
-                  style={{
-                    width: "35px",
-                    height: "35px",
-                    borderRadius: "50%",
-                    background: "#e9e9ff",
-                    marginRight: "10px",
-                  }}
-                />
-              )}
-
+          {messages.map((msg, idx) => {
+            const isUser = msg.role === "user";
+            return (
               <div
+                key={idx}
                 style={{
-                  maxWidth: "70%",
-                  background:
-                    msg.role === "user" ? "#9b4dff" : "#f3f3f3",
-                  color: msg.role === "user" ? "white" : "#333",
-                  padding: "12px 16px",
-                  borderRadius: "18px",
-                  fontSize: "15px",
+                  display: "flex",
+                  justifyContent: isUser ? "flex-end" : "flex-start",
                 }}
               >
-                {msg.content}
-              </div>
+                {/* Bot avatar on left */}
+                {!isUser && (
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      background: "#e9e9ff",
+                      marginRight: 10,
+                      alignSelf: "flex-start",
+                      flexShrink: 0,
+                    }}
+                  />
+                )}
 
-              {msg.role === "user" && (
+                {/* Message bubble */}
                 <div
                   style={{
-                    width: "35px",
-                    height: "35px",
-                    borderRadius: "50%",
-                    background: "#d6b4ff",
-                    marginLeft: "10px",
+                    maxWidth: "75%",
+                    background: isUser ? "#9b4dff" : "#f3f3f3",
+                    color: isUser ? "#fff" : "#333",
+                    padding: "10px 14px",
+                    borderRadius: 18,
+                    borderBottomRightRadius: isUser ? 4 : 18,
+                    borderBottomLeftRadius: isUser ? 18 : 4,
+                    fontSize: 15,
+                    lineHeight: 1.5,
+                    wordBreak: "break-word",
+                    whiteSpace: "pre-wrap", // <-- preserves \n from backend
                   }}
-                />
-              )}
-            </div>
-          ))}
+                >
+                  {msg.content}
+                </div>
 
-          {/* Typing animation */}
+                {/* User avatar on right */}
+                {isUser && (
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      background: "#d6b4ff",
+                      marginLeft: 10,
+                      alignSelf: "flex-start",
+                      flexShrink: 0,
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
+
           {typing && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
-            >
+            <div style={{ display: "flex", alignItems: "center" }}>
               <div
                 style={{
-                  width: "35px",
-                  height: "35px",
+                  width: 32,
+                  height: 32,
                   borderRadius: "50%",
                   background: "#e9e9ff",
-                  marginRight: "10px",
+                  marginRight: 10,
+                  flexShrink: 0,
                 }}
-              ></div>
-
+              />
               <div
-                className="typing"
                 style={{
                   background: "#f3f3f3",
-                  padding: "10px 16px",
-                  borderRadius: "16px",
+                  padding: "8px 14px",
+                  borderRadius: 16,
                 }}
               >
-                <span className="dot"></span>
-                <span className="dot"></span>
-                <span className="dot"></span>
+                ...
               </div>
-
-              <style>{`
-                .typing {
-                  display: flex;
-                  gap: 4px;
-                }
-                .dot {
-                  width: 8px;
-                  height: 8px;
-                  background: #bbb;
-                  border-radius: 50%;
-                  animation: blink 1.4s infinite both;
-                }
-                .dot:nth-child(2) {
-                  animation-delay: 0.2s;
-                }
-                .dot:nth-child(3) {
-                  animation-delay: 0.4s;
-                }
-                @keyframes blink {
-                  0% { opacity: .2; }
-                  20% { opacity: 1; }
-                  100% { opacity: .2; }
-                }
-              `}</style>
             </div>
           )}
 
-          <div ref={chatEndRef}></div>
+          <div ref={chatEndRef} />
         </div>
 
-        {/* Input Area */}
+        {/* INPUT AREA */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            marginTop: "10px",
+            marginTop: 12,
+            gap: 8,
           }}
         >
-          {/* File Upload Button */}
           <button
-            onClick={() => fileInputRef.current.click()}
+            onClick={() => fileInputRef.current?.click()}
             style={{
               background: "#eee",
               border: "none",
-              width: "45px",
-              height: "45px",
+              width: 42,
+              height: 42,
               borderRadius: "50%",
-              marginRight: "10px",
-              fontSize: "20px",
+              fontSize: 20,
               cursor: "pointer",
+              flexShrink: 0,
             }}
           >
             📎
           </button>
+
           <input
             type="file"
             ref={fileInputRef}
             style={{ display: "none" }}
-            onChange={(e) => uploadFile(e.target.files[0])}
+            onChange={(e) => e.target.files && uploadFile(e.target.files[0])}
           />
 
-          {/* Text Input */}
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             placeholder="Enter message"
             style={{
               flexGrow: 1,
               border: "1px solid #ddd",
               padding: "12px 15px",
-              borderRadius: "25px",
+              borderRadius: 25,
               outline: "none",
-              fontSize: "15px",
+              fontSize: 15,
             }}
           />
 
-          {/* Send Button */}
           <button
             onClick={sendMessage}
             style={{
               background: "#9b4dff",
               border: "none",
-              width: "45px",
-              height: "45px",
+              width: 42,
+              height: 42,
               borderRadius: "50%",
-              marginLeft: "10px",
               cursor: "pointer",
-              fontSize: "20px",
-              color: "white",
+              fontSize: 20,
+              color: "#fff",
+              flexShrink: 0,
             }}
           >
             ✈️
@@ -285,12 +269,3 @@ export default function Home() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
