@@ -40,14 +40,6 @@
         "preapproved": true
     },
     {
-        "offer_id": "string",
-        "customer_id": "string",
-        "amount": 0,
-        "tenure_months": 0,
-        "apr": 0.0,
-        "preapproved": true
-    },
-    {
         "offer_id": "OFF006",
         "customer_id": "C006",
         "amount": 600000,

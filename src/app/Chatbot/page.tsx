@@ -1,21 +1,28 @@
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import Chatbot from "../../chatbot/chatbot";
 
 export default async function ChatbotPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/login"); // force login
+    redirect("/login");
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">Welcome, {session.user?.name}</h1>
-      <p>Your chatbot goes here.</p>
+    <div className="h-screen flex flex-col">
+      {/* Header */}
+      <div className="p-4 border-b">
+        <h1 className="text-xl font-semibold">
+          Welcome, {session.user?.name}
+        </h1>
+      </div>
+
+      {/* Chatbot UI */}
+      <div className="flex-1 overflow-hidden">
+        <Chatbot />
+      </div>
     </div>
   );
 }
-
-
-

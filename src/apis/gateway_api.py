@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import httpx
 import traceback
+from identity.customer_identity import resolve_customer_id
 
 GATEWAY_PORT = 9000
 AGENT_BASE_URL = "http://127.0.0.1:8000"  # master_agent_api
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 class ChatRequest(BaseModel):
+    email: str      # from federated login
     message: str
 
 @app.get("/health")
@@ -27,10 +29,19 @@ def health():
 @app.post("/chat")
 async def chat(payload: ChatRequest):
     try:
+        # Resolve identity here (Gateway responsibility)
+        customer_id = resolve_customer_id(payload.email)
+
+        # Do NOT forward email to agents
+        agent_payload = {
+            "customer_id": customer_id,
+            "message": payload.message
+        }
+
         async with httpx.AsyncClient(timeout=300.0) as client:
             response = await client.post(
                 f"{AGENT_BASE_URL}/chat",
-                json=payload.dict()
+                json=agent_payload
             )
 
         print("MASTER STATUS:", response.status_code)
@@ -38,18 +49,6 @@ async def chat(payload: ChatRequest):
 
         return response.json()
 
-    except httpx.RequestError as e:
-        print("REQUEST ERROR:", repr(e))
-        traceback.print_exc()
-        raise HTTPException(
-            status_code=502,
-            detail=f"Agent service unreachable: {str(e)}"
-        )
-
     except Exception as e:
-        print("GENERAL ERROR:", repr(e))
         traceback.print_exc()
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=500, detail=str(e))

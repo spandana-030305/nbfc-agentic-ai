@@ -1,6 +1,7 @@
 [
   {
     "pan": "ABCDE1234F",
+    "customer_id": "C001",
     "name": "Sai Spandana",
     "dob": "2003-05-14",
     "status": "ACTIVE",
@@ -8,6 +9,7 @@
   },
   {
     "pan": "PQRSX9876K",
+    "customer_id": "C002",
     "name": "Sai Sathvika",
     "dob": "1998-08-21",
     "status": "ACTIVE",
@@ -15,6 +17,7 @@
   },
   {
     "pan": "LMNOP4567Q",
+    "customer_id": "C003",
     "name": "Sai Rajani",
     "dob": "1995-02-10",
     "status": "ACTIVE",
@@ -22,6 +25,7 @@
   },
   {
     "pan": "AAAAA0000Z",
+    "customer_id": "C004",
     "name": "Fraud User",
     "dob": "1990-01-01",
     "status": "BLOCKED",
@@ -29,6 +33,7 @@
   },
   {
     "pan": "BBBBB1111C",
+    "customer_id": "C005",
     "name": "Dormant Account",
     "dob": "1987-07-19",
     "status": "INACTIVE",
