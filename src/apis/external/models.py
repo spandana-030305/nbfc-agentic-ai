@@ -37,3 +37,12 @@ class BankStatementResponse(BaseModel):
     avg_balance: float
     transactions: List[Transaction]
 
+class CreditScoreRequest(BaseModel):
+    customer_id: str
+
+
+class CreditScoreResponse(BaseModel):
+    credit_score: int
+    active_loans: int
+    late_payments: int
+

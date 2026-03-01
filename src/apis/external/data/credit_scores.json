@@ -1,0 +1,27 @@
+{
+  "C001": {
+    "credit_score": 750,
+    "active_loans": 2,
+    "late_payments": 0
+  },
+  "C002": {
+    "credit_score": 620,
+    "active_loans": 3,
+    "late_payments": 2
+  },
+  "C003": {
+    "credit_score": 680,
+    "active_loans": 1,
+    "late_payments": 1
+  },
+  "C004": {
+    "credit_score": 810,
+    "active_loans": 0,
+    "late_payments": 0
+  },
+  "C005": {
+    "credit_score": 540,
+    "active_loans": 4,
+    "late_payments": 5
+  }  
+}
