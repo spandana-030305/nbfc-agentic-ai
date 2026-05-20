@@ -46,3 +46,15 @@ class CreditScoreResponse(BaseModel):
     active_loans: int
     late_payments: int
 
+class UnderwritingRequest(BaseModel):
+    customer_id: str
+    credit_score: int
+    income_status: str
+    emi_ratio: float | None
+
+
+class UnderwritingResponse(BaseModel):
+    decision: str
+    risk_level: str
+    remarks: str
+

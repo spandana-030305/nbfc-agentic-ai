@@ -6,3 +6,4 @@ python-dotenv==1.0.1
 reportlab==4.1.0
 pydantic>=2.10.0,<3.0.0
 langchain-ollama
+pytest==7.4.0
