@@ -1,7 +1,7 @@
 from autogen_agentchat.agents import UserProxyAgent
 import requests
 
-CREDIT_BUREAU_API = "http://localhost:8003/credit-score"
+CREDIT_BUREAU_API = "http://localhost:8002/credit-score"
 
 
 class UnderwritingAgent(UserProxyAgent):

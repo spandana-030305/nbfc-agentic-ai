@@ -31,6 +31,8 @@ async def chat(payload: ChatRequest):
     try:
         # Resolve identity here (Gateway responsibility)
         customer_id = resolve_customer_id(payload.email)
+        print("EMAIL:", payload.email)
+        print("RESOLVED CUSTOMER ID:", customer_id)
 
         # Do NOT forward email to agents
         agent_payload = {
@@ -38,7 +40,7 @@ async def chat(payload: ChatRequest):
             "message": payload.message
         }
 
-        async with httpx.AsyncClient(timeout=300.0) as client:
+        async with httpx.AsyncClient(timeout=600.0) as client:
             response = await client.post(
                 f"{AGENT_BASE_URL}/chat",
                 json=agent_payload

@@ -3,16 +3,20 @@ from langchain_core.tools import tool
 from langchain.agents import create_agent
 from langgraph.checkpoint.memory import MemorySaver
 
-# -----------------------------
+
+# ---------------------------------------------------
 # TOOLS
-# -----------------------------
+# ---------------------------------------------------
 
 @tool
-def kyc_agent_tool(pan: str, name: str, dob: str) -> str:
+def kyc_agent_tool(
+    pan: str,
+    name: str,
+    dob: str
+) -> str:
     """
     Perform PAN-based KYC verification.
     """
-
     from agents.kyc_agent import kyc_agent_task
 
     result = kyc_agent_task(
@@ -25,11 +29,13 @@ def kyc_agent_tool(pan: str, name: str, dob: str) -> str:
 
 
 @tool
-def income_agent_tool(customer_id: str) -> str:
+def income_agent_tool(
+    customer_id: str
+) -> str:
     """
-    Perform income verification using bank statements.
+    Perform income verification
+    using bank statements.
     """
-
     from agents.income_agent import income_agent_task
 
     result = income_agent_task(customer_id)
@@ -38,11 +44,13 @@ def income_agent_tool(customer_id: str) -> str:
 
 
 @tool
-def sales_agent_tool(customer_id: str) -> str:
+def sales_agent_tool(
+    customer_id: str
+) -> str:
     """
-    Get best loan offers for customer ID.
+    Get best loan offers
+    for customer ID.
     """
-
     from agents.sales_agent import sales_agent_task
 
     offers = sales_agent_task(customer_id)
@@ -51,14 +59,12 @@ def sales_agent_tool(customer_id: str) -> str:
 
 
 @tool
-def compliance_agent_tool(customer_id: str) -> str:
+def compliance_agent_tool(
+    customer_id: str
+) -> str:
     """
-    Perform compliance verification using:
-    - KYC status
-    - Blacklist check
-    - Credit score validation
+    Perform compliance verification.
     """
-
     from agents.compliance_agent import compliance_agent_task
 
     result = compliance_agent_task(customer_id)
@@ -69,36 +75,34 @@ def compliance_agent_tool(customer_id: str) -> str:
 @tool
 def underwriting_agent_tool(
     customer_id: str,
-    credit_score: int,
-    income_status: str,
-    emi_ratio: float
+    requested_loan_amount: float,
+    preapproved_limit: float,
+    monthly_salary: float = None,
+    expected_emi: float = None
 ) -> str:
     """
-    Perform underwriting evaluation for loan approval.
+    Perform underwriting evaluation.
     """
-
     from agents.underwriting_agent import underwriting_agent_task
 
     result = underwriting_agent_task(
         customer_id=customer_id,
-        credit_score=credit_score,
-        income_status=income_status,
-        emi_ratio=emi_ratio
+        requested_loan_amount=requested_loan_amount,
+        preapproved_limit=preapproved_limit,
+        monthly_salary=monthly_salary,
+        expected_emi=expected_emi
     )
 
     return f"Underwriting Result: {result}"
 
 
 @tool
-def pricing_agent_tool(customer_id: str) -> str:
+def pricing_agent_tool(
+    customer_id: str
+) -> str:
     """
-    Calculate loan pricing details:
-    - Eligible loan amount
-    - Interest rate
-    - EMI eligibility
-    - Recommended tenure
+    Calculate loan pricing.
     """
-
     from agents.pricing_agent import pricing_agent_task
 
     result = pricing_agent_task(customer_id)
@@ -117,12 +121,9 @@ def sanction_letter_agent_tool(
     pricing_status: str
 ) -> str:
     """
-    Generate loan sanction letter.
+    Generate sanction letter.
     """
-
-    from agents.sanction_letter_agent import (
-        sanction_letter_agent_task
-    )
+    from agents.sanction_letter_agent import sanction_letter_agent_task
 
     result = sanction_letter_agent_task(
         customer_id=customer_id,
@@ -137,9 +138,9 @@ def sanction_letter_agent_tool(
     return f"Sanction Letter Result: {result}"
 
 
-# -----------------------------
+# ---------------------------------------------------
 # MASTER AGENT
-# -----------------------------
+# ---------------------------------------------------
 
 class MasterAgent:
 
@@ -148,23 +149,16 @@ class MasterAgent:
         self.llm = ChatOllama(
             model="llama3.1:8b",
             temperature=0.1,
-            base_url="http://localhost:11434",
+            base_url="http://localhost:11434"
         )
 
-        # -----------------------------
-        # STATUS TRACKING
-        # -----------------------------
-
+        # Status tracking
         self.kyc_status = None
         self.income_status = None
         self.compliance_status = None
         self.underwriting_decision = None
         self.pricing_status = None
         self.sanction_status = None
-
-        # -----------------------------
-        # REGISTER ALL TOOLS
-        # -----------------------------
 
         tools = [
             kyc_agent_tool,
@@ -176,15 +170,7 @@ class MasterAgent:
             sanction_letter_agent_tool
         ]
 
-        # -----------------------------
-        # MEMORY
-        # -----------------------------
-
         checkpointer = MemorySaver()
-
-        # -----------------------------
-        # CREATE AGENT
-        # -----------------------------
 
         self.agent = create_agent(
             self.llm,
@@ -192,11 +178,15 @@ class MasterAgent:
             checkpointer=checkpointer
         )
 
-    # -----------------------------
+    # ---------------------------------------------------
     # RUN MASTER AGENT
-    # -----------------------------
+    # ---------------------------------------------------
 
-    def run(self, user_message: str) -> str:
+    def run(
+        self,
+        user_message: str,
+        customer_id: str
+    ) -> str:
 
         config = {
             "configurable": {
@@ -207,165 +197,97 @@ class MasterAgent:
         result = self.agent.invoke(
             {
                 "messages": [
+                    (
+                        "system",
+                        f"Customer ID is {customer_id}. "
+                        f"Use this ID whenever tools require customer_id."
+                    ),
                     ("user", user_message)
                 ]
             },
             config
         )
 
-        # -----------------------------
-        # PARSE AGENT RESPONSES
-        # -----------------------------
+        # ------------------------------------
+        # Parse responses
+        # ------------------------------------
 
         for msg in result["messages"]:
 
             if isinstance(msg.content, str):
                 print("AGENT MSG:", msg.content)
 
-            # -----------------------------
-            # KYC STATUS
-            # -----------------------------
-
             if "KYC Result" in msg.content:
-
                 if "'kyc_status': 'VERIFIED'" in msg.content:
                     self.kyc_status = "VERIFIED"
-
                 elif "'kyc_status': 'FAILED'" in msg.content:
                     self.kyc_status = "FAILED"
 
-            # -----------------------------
-            # INCOME STATUS
-            # -----------------------------
-
             if "Income Verification Result" in msg.content:
-
                 if "'income_status': 'VERIFIED'" in msg.content:
                     self.income_status = "VERIFIED"
-
                 elif "'income_status': 'FAILED'" in msg.content:
                     self.income_status = "FAILED"
 
-            # -----------------------------
-            # COMPLIANCE STATUS
-            # -----------------------------
-
             if "Compliance Verification Result" in msg.content:
-
                 if "'compliance_status': 'APPROVED'" in msg.content:
                     self.compliance_status = "APPROVED"
-
                 elif "'compliance_status': 'FAILED'" in msg.content:
                     self.compliance_status = "FAILED"
 
-            # -----------------------------
-            # UNDERWRITING DECISION
-            # -----------------------------
-
             if "Underwriting Result" in msg.content:
-
                 if "'decision': 'APPROVED'" in msg.content:
                     self.underwriting_decision = "APPROVED"
-
                 elif "'decision': 'REJECTED'" in msg.content:
                     self.underwriting_decision = "REJECTED"
-
-                elif "'decision': 'REVIEW'" in msg.content:
-                    self.underwriting_decision = "REVIEW"
-
-            # -----------------------------
-            # PRICING STATUS
-            # -----------------------------
+                elif "'decision': 'PENDING_DOCUMENT'" in msg.content:
+                    self.underwriting_decision = "PENDING_DOCUMENT"
 
             if "Pricing Result" in msg.content:
-
                 if "'pricing_status': 'APPROVED'" in msg.content:
                     self.pricing_status = "APPROVED"
-
-                elif "'pricing_status': 'FAILED'" in msg.content:
-                    self.pricing_status = "FAILED"
-
                 elif "'pricing_status': 'REJECTED'" in msg.content:
                     self.pricing_status = "REJECTED"
 
-            # -----------------------------
-            # SANCTION LETTER STATUS
-            # -----------------------------
-
             if "Sanction Letter Result" in msg.content:
-
                 if "'sanction_status': 'APPROVED'" in msg.content:
                     self.sanction_status = "APPROVED"
-
                 elif "'sanction_status': 'FAILED'" in msg.content:
                     self.sanction_status = "FAILED"
 
-        # -----------------------------
-        # HARD COMPLIANCE GATES
-        # -----------------------------
+        # ------------------------------------
+        # Hard gates
+        # ------------------------------------
 
         if "loan" in user_message.lower():
 
-            # KYC Check
             if self.kyc_status == "FAILED":
-                return (
-                    "Loan cannot be processed because "
-                    "KYC verification failed."
-                )
+                return "Loan cannot be processed because KYC failed."
 
-            # Income Check
             if self.income_status == "FAILED":
-                return (
-                    "Loan cannot be processed because "
-                    "income eligibility failed."
-                )
+                return "Loan cannot be processed because income verification failed."
 
-            # Compliance Check
             if self.compliance_status == "FAILED":
-                return (
-                    "Loan cannot be processed because "
-                    "compliance verification failed."
-                )
+                return "Loan cannot be processed because compliance failed."
 
-            # Underwriting Check
             if self.underwriting_decision == "REJECTED":
-                return (
-                    "Loan application rejected during "
-                    "underwriting evaluation."
-                )
+                return "Loan application rejected during underwriting."
 
-            # Manual Review
-            if self.underwriting_decision == "REVIEW":
-                return (
-                    "Loan application requires manual review "
-                    "by underwriting team."
-                )
+            if self.underwriting_decision == "PENDING_DOCUMENT":
+                return "Salary slip upload required for underwriting approval."
 
-            # Pricing Check
             if self.pricing_status == "REJECTED":
+                return "Loan pricing rejected due to EMI burden or eligibility."
 
-                return (
-                    "Loan pricing rejected due to "
-                    "eligibility or EMI burden."
-                )
-
-            # Sanction Letter Check
             if self.sanction_status == "FAILED":
-
-                return (
-                    "Loan sanction letter generation failed."
-                )
-
-        # -----------------------------
-        # FINAL RESPONSE
-        # -----------------------------
+                return "Loan sanction letter generation failed."
 
         return result["messages"][-1].content
 
 
-# -----------------------------
-# MAIN EXECUTION
-# -----------------------------
+# ---------------------------------------------------
+# LOCAL TESTING
+# ---------------------------------------------------
 
 if __name__ == "__main__":
 
@@ -378,11 +300,13 @@ if __name__ == "__main__":
         user_input = input("User: ")
 
         if user_input.lower() in ["exit", "quit"]:
-
             print("Exiting system...")
             break
 
-        response = master_agent.run(user_input)
+        response = master_agent.run(
+            user_message=user_input,
+            customer_id="C002"
+        )
 
         print("\nMASTER AGENT RESPONSE:")
         print(response)

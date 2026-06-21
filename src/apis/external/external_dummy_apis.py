@@ -63,6 +63,9 @@ with open("apis/external/data/bank_statements.json", "r") as f:
 with open("apis/external/data/credit_scores.json", "r") as f:
     CREDIT_DB = json.load(f)
 
+with open("apis/external/data/customers.json", "r") as f:
+    CUSTOMER_DB = json.load(f)
+
 
 # =====================================================
 # REGEX
@@ -231,96 +234,112 @@ def underwriting_decision(
     data: UnderwritingRequest
 ):
     """
-    Simulates underwriting decision based on:
-    - Credit Score
-    - Income Verification
-    - EMI Ratio
+    Underwriting Rules
+
+    1. Fetch credit score
+    2. Reject if credit score < 700
+    3. Approve if requested amount <= pre-approved limit
+    4. If <= 2x pre-approved:
+       require salary slip
+       approve if EMI <= 50% salary
+    5. Reject otherwise
     """
 
-    credit_score = data.credit_score
-    income_status = data.income_status
-    emi_ratio = data.emi_ratio
+    # --------------------------------
+    # Fetch credit score from DB
+    # --------------------------------
 
-    # Rule 1: Income verification
+    record = CREDIT_DB.get(
+        data.customer_id
+    )
 
-    if income_status != "VERIFIED":
-
-        return UnderwritingResponse(
-            decision="REJECTED",
-            risk_level="HIGH",
-            remarks="Income verification failed"
-        )
-
-    # Rule 2: Missing EMI ratio
-
-    if emi_ratio is None:
+    if not record:
 
         return UnderwritingResponse(
             decision="REJECTED",
-            risk_level="HIGH",
-            remarks="Invalid EMI ratio"
+            credit_score=0,
+            remarks="Credit score not found"
         )
 
-    # Rule 3: Very low credit score
+    credit_score = record["credit_score"]
 
-    if credit_score < 600:
+    # --------------------------------
+    # Rule 1
+    # --------------------------------
+
+    if credit_score < 700:
 
         return UnderwritingResponse(
             decision="REJECTED",
-            risk_level="HIGH",
-            remarks="Very low credit score"
+            credit_score=credit_score,
+            remarks="Credit score below minimum threshold"
         )
 
-    # Rule 4: Borderline cases
+    # --------------------------------
+    # Rule 2
+    # --------------------------------
 
-    if 600 <= credit_score < 700:
-
-        if emi_ratio > 0.5:
-
-            return UnderwritingResponse(
-                decision="REJECTED",
-                risk_level="HIGH",
-                remarks=(
-                    "High EMI burden "
-                    "with low credit score"
-                )
-            )
-
-        return UnderwritingResponse(
-            decision="REVIEW",
-            risk_level="MEDIUM",
-            remarks=(
-                "Borderline credit profile, "
-                "needs manual review"
-            )
-        )
-
-    # Rule 5: EMI burden
-
-    if emi_ratio > 0.4:
-
-        return UnderwritingResponse(
-            decision="REVIEW",
-            risk_level="MEDIUM",
-            remarks="Moderate EMI burden"
-        )
-
-    # Rule 6: Strong profile
-
-    if credit_score >= 700 and emi_ratio <= 0.4:
+    if (
+        data.requested_loan_amount
+        <= data.preapproved_limit
+    ):
 
         return UnderwritingResponse(
             decision="APPROVED",
-            risk_level="LOW",
-            remarks=(
-                "Strong credit and stable income"
-            )
+            credit_score=credit_score,
+            remarks="Within pre-approved limit"
         )
 
+    # --------------------------------
+    # Rule 3
+    # --------------------------------
+
+    if (
+        data.requested_loan_amount
+        <= 2 * data.preapproved_limit
+    ):
+
+        if data.monthly_salary is None:
+
+            return UnderwritingResponse(
+                decision="PENDING_DOCUMENT",
+                credit_score=credit_score,
+                remarks="Salary slip required"
+            )
+
+        if data.expected_emi is None:
+
+            return UnderwritingResponse(
+                decision="REJECTED",
+                credit_score=credit_score,
+                remarks="Expected EMI missing"
+            )
+
+        if (
+            data.expected_emi
+            <= data.monthly_salary * 0.5
+        ):
+
+            return UnderwritingResponse(
+                decision="APPROVED",
+                credit_score=credit_score,
+                remarks="Approved after salary verification"
+            )
+
+        return UnderwritingResponse(
+            decision="REJECTED",
+            credit_score=credit_score,
+            remarks="EMI exceeds 50% of salary"
+        )
+
+    # --------------------------------
+    # Rule 4
+    # --------------------------------
+
     return UnderwritingResponse(
-        decision="REVIEW",
-        risk_level="MEDIUM",
-        remarks="Requires additional checks"
+        decision="REJECTED",
+        credit_score=credit_score,
+        remarks="Requested amount exceeds underwriting limit"
     )
 
 

@@ -1,8 +1,8 @@
 from autogen_agentchat.agents import UserProxyAgent
 import requests
 
-KYC_API_URL = "http://localhost:8001/kyc/verify"
-CIBIL_API_URL = "http://localhost:8003/credit-score"
+KYC_API_URL = "http://localhost:8002/pan/verify"
+CIBIL_API_URL = "http://localhost:8002/credit-score"
 
 class ComplianceAgent(UserProxyAgent):
     def __init__(self):

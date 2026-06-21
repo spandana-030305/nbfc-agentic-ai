@@ -9,19 +9,30 @@ class SalesAgent(UserProxyAgent):
         super().__init__(name="SalesAgent")
 
     def fetch_offers(self, customer_id: str):
+        print("SALES AGENT RECEIVED:", customer_id)
+
         url = f"{OFFER_MART_URL}/{customer_id}"
+
         try:
             resp = requests.get(url, timeout=5)
+            print("OFFER API STATUS:", resp.status_code)
+            print("OFFER API BODY:", resp.text)
+
             resp.raise_for_status()
             offers = resp.json()
-        except requests.RequestException:
-            # Any HTTP / network / timeout error
+
+        except requests.RequestException as e:
+            print("SALES ERROR:", e)
             return {"offers": []}
 
         if not offers:
             return {"offers": []}
 
-        best_offer = min(offers, key=lambda o: o["apr"])
+        best_offer = min(
+            offers,
+            key=lambda o: o["apr"]
+        )
+
         return {"offers": [best_offer]}
 
 
@@ -30,4 +41,3 @@ sales_agent = SalesAgent()
 
 def sales_agent_task(customer_id: str):
     return sales_agent.fetch_offers(customer_id)
-

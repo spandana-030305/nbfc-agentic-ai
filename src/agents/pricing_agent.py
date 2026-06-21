@@ -5,7 +5,7 @@ import requests
 # EXTERNAL API CONFIGURATION
 # ---------------------------------------------------
 
-CIBIL_API_URL = "http://localhost:8003/credit-score"
+CIBIL_API_URL = "http://localhost:8002/credit-score"
 BANK_API_URL = "http://localhost:8002/bank-statements"
 
 

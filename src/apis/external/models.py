@@ -1,9 +1,10 @@
 from pydantic import BaseModel
 from datetime import date
-from typing import List
+from typing import List, Optional
+
 
 # ----------------------------
-# PAN MODELS (NO CHANGE)
+# PAN MODELS
 # ----------------------------
 
 class PANRequest(BaseModel):
@@ -18,7 +19,7 @@ class PANResponse(BaseModel):
 
 
 # ----------------------------
-# BANK STATEMENT MODELS (NEW)
+# BANK STATEMENT MODELS
 # ----------------------------
 
 class Transaction(BaseModel):
@@ -37,6 +38,11 @@ class BankStatementResponse(BaseModel):
     avg_balance: float
     transactions: List[Transaction]
 
+
+# ----------------------------
+# CREDIT SCORE MODELS
+# ----------------------------
+
 class CreditScoreRequest(BaseModel):
     customer_id: str
 
@@ -46,15 +52,70 @@ class CreditScoreResponse(BaseModel):
     active_loans: int
     late_payments: int
 
+
+# ----------------------------
+# UNDERWRITING MODELS
+# (updated according to new rules)
+# ----------------------------
+
 class UnderwritingRequest(BaseModel):
     customer_id: str
-    credit_score: int
-    income_status: str
-    emi_ratio: float | None
+    requested_loan_amount: float
+    preapproved_limit: float
+    monthly_salary: Optional[float] = None
+    expected_emi: Optional[float] = None
 
 
 class UnderwritingResponse(BaseModel):
     decision: str
-    risk_level: str
+    credit_score: int
     remarks: str
 
+
+# ----------------------------
+# PRICING AGENT MODELS
+# ----------------------------
+
+class PricingRequest(BaseModel):
+    customer_id: str
+    requested_loan_amount: float
+    credit_score: int
+    tenure_months: int
+
+
+class PricingResponse(BaseModel):
+    pricing_status: str
+    interest_rate: float
+    approved_amount: float
+    tenure_months: int
+    estimated_emi: float
+    remarks: str
+
+
+# ----------------------------
+# SANCTION LETTER MODELS
+# ----------------------------
+
+class SanctionLetterRequest(BaseModel):
+    customer_id: str
+    customer_name: str
+    loan_amount: float
+    interest_rate: float
+    tenure_months: int
+    underwriting_decision: str
+    pricing_status: str
+
+
+class SanctionLetterResponse(BaseModel):
+    sanction_status: str
+    sanction_id: str
+    customer_id: str
+    customer_name: str
+    loan_amount: float
+    interest_rate: float
+    tenure_months: int
+    estimated_emi: float
+    generated_on: str
+    pdf_path: str
+    sanction_letter: str
+    remarks: str
