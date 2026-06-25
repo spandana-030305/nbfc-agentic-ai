@@ -54,6 +54,63 @@ class CreditScoreResponse(BaseModel):
 
 
 # ----------------------------
+# CRM MODELS
+# ----------------------------
+
+class CRMRequest(BaseModel):
+    customer_id: str
+
+
+class CRMResponse(BaseModel):
+    crm_verification_status: str
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    message: str
+
+
+# ----------------------------
+# eSIGN MODELS
+# ----------------------------
+
+class eSignRequest(BaseModel):
+    customer_id: str
+    customer_name: str
+    loan_amount: float
+    sanction_id: str
+
+
+class eSignResponse(BaseModel):
+    sign_status: str
+    signature_id: Optional[str] = None
+    signed_at: Optional[str] = None
+    documents: List[str] = []
+    message: str
+
+
+# ----------------------------
+# DISBURSEMENT MODELS
+# ----------------------------
+
+class DisbursementRequest(BaseModel):
+    customer_id: str
+    customer_name: str
+    loan_amount: float
+    sanction_id: str
+    signature_id: str
+
+
+class DisbursementResponse(BaseModel):
+    disbursement_status: str
+    disbursement_id: Optional[str] = None
+    amount_disbursed: float = 0
+    processing_time: Optional[str] = None
+    bank_reference: Optional[str] = None
+    expected_credit_date: Optional[str] = None
+    message: str
+
+
+# ----------------------------
 # UNDERWRITING MODELS
 # (updated according to new rules)
 # ----------------------------

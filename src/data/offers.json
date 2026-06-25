@@ -46,5 +46,37 @@
         "tenure_months": 72,
         "apr": 16.0,
         "preapproved": true
+    },
+    {
+        "offer_id": "OFF007",
+        "customer_id": "C007",
+        "amount": 160000,
+        "tenure_months": 36,
+        "apr": 12.8,
+        "preapproved": true
+    },
+    {
+        "offer_id": "OFF008",
+        "customer_id": "C008",
+        "amount": 220000,
+        "tenure_months": 48,
+        "apr": 13.2,
+        "preapproved": true
+    },
+    {
+        "offer_id": "OFF009",
+        "customer_id": "C009",
+        "amount": 350000,
+        "tenure_months": 60,
+        "apr": 11.5,
+        "preapproved": true
+    },
+    {
+        "offer_id": "OFF010",
+        "customer_id": "C010",
+        "amount": 100000,
+        "tenure_months": 24,
+        "apr": 14.8,
+        "preapproved": true
     }
 ]

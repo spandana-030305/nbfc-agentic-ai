@@ -4,34 +4,201 @@
     "email": "saispandana.chalasani05@gmail.com",
     "name": "Sai Spandana",
     "login_provider": "google",
-    "created_at": "2024-12-01T10:15:30Z"
+    "created_at": "2024-12-01T10:15:30Z",
+    "age": 28,
+    "city": "Bangalore",
+    "monthly_salary": 75000,
+    "credit_score": 750,
+    "preapproved_limit": 150000,
+    "existing_loans": [
+      {
+        "type": "auto",
+        "amount": 500000,
+        "monthly_emi": 8000
+      }
+    ],
+    "bank_account": "1234567890",
+    "avg_balance": 50000,
+    "pan": "AAAPA1234A"
   },
   {
     "customer_id": "C002",
     "email": "saisathvika2212@gmail.com",
     "name": "Sai Sathvika",
     "login_provider": "google",
-    "created_at": "2024-12-01T10:18:10Z"
+    "created_at": "2024-12-01T10:18:10Z",
+    "age": 32,
+    "city": "Mumbai",
+    "monthly_salary": 95000,
+    "credit_score": 780,
+    "preapproved_limit": 200000,
+    "existing_loans": [
+      {
+        "type": "home",
+        "amount": 2000000,
+        "monthly_emi": 18000
+      }
+    ],
+    "bank_account": "9876543210",
+    "avg_balance": 75000,
+    "pan": "BBBPB5678B"
   },
   {
     "customer_id": "C003",
     "email": "sairajani@gmail.com",
     "name": "Sai Rajani",
     "login_provider": "google",
-    "created_at": "2024-12-01T10:20:45Z"
+    "created_at": "2024-12-01T10:20:45Z",
+    "age": 26,
+    "city": "Hyderabad",
+    "monthly_salary": 65000,
+    "credit_score": 720,
+    "preapproved_limit": 120000,
+    "existing_loans": [],
+    "bank_account": "5555666677",
+    "avg_balance": 35000,
+    "pan": "CCCPC9012C"
   },
   {
     "customer_id": "C004",
     "email": "fraud.user@gmail.com",
     "name": "Fraud User",
     "login_provider": "google",
-    "created_at": "2024-12-01T10:25:00Z"
+    "created_at": "2024-12-01T10:25:00Z",
+    "age": 35,
+    "city": "Delhi",
+    "monthly_salary": 55000,
+    "credit_score": 620,
+    "preapproved_limit": 80000,
+    "existing_loans": [
+      {
+        "type": "personal",
+        "amount": 300000,
+        "monthly_emi": 15000
+      }
+    ],
+    "bank_account": "1111222233",
+    "avg_balance": 8000,
+    "pan": "DDDPD3456D"
   },
   {
     "customer_id": "C005",
     "email": "dormant.account@gmail.com",
     "name": "Dormant Account",
     "login_provider": "google",
-    "created_at": "2024-12-01T10:30:20Z"
+    "created_at": "2024-12-01T10:30:20Z",
+    "age": 45,
+    "city": "Chennai",
+    "monthly_salary": 85000,
+    "credit_score": 740,
+    "preapproved_limit": 180000,
+    "existing_loans": [
+      {
+        "type": "home",
+        "amount": 1500000,
+        "monthly_emi": 14000
+      }
+    ],
+    "bank_account": "4444555566",
+    "avg_balance": 60000,
+    "pan": "EEEPE7890E"
+  },
+  {
+    "customer_id": "C006",
+    "email": "priya.sharma@gmail.com",
+    "name": "Priya Sharma",
+    "login_provider": "google",
+    "created_at": "2024-12-02T08:45:15Z",
+    "age": 31,
+    "city": "Pune",
+    "monthly_salary": 110000,
+    "credit_score": 800,
+    "preapproved_limit": 300000,
+    "existing_loans": [],
+    "bank_account": "7777888899",
+    "avg_balance": 90000,
+    "pan": "FFFPF0123F"
+  },
+  {
+    "customer_id": "C007",
+    "email": "rajesh.kumar@gmail.com",
+    "name": "Rajesh Kumar",
+    "login_provider": "google",
+    "created_at": "2024-12-02T09:20:30Z",
+    "age": 38,
+    "city": "Kolkata",
+    "monthly_salary": 78000,
+    "credit_score": 765,
+    "preapproved_limit": 160000,
+    "existing_loans": [
+      {
+        "type": "auto",
+        "amount": 800000,
+        "monthly_emi": 12000
+      }
+    ],
+    "bank_account": "2222333344",
+    "avg_balance": 42000,
+    "pan": "GGGPG4567G"
+  },
+  {
+    "customer_id": "C008",
+    "email": "anjali.verma@gmail.com",
+    "name": "Anjali Verma",
+    "login_provider": "google",
+    "created_at": "2024-12-02T10:15:45Z",
+    "age": 29,
+    "city": "Bangalore",
+    "monthly_salary": 88000,
+    "credit_score": 755,
+    "preapproved_limit": 220000,
+    "existing_loans": [
+      {
+        "type": "personal",
+        "amount": 150000,
+        "monthly_emi": 5000
+      }
+    ],
+    "bank_account": "8888999900",
+    "avg_balance": 55000,
+    "pan": "HHHPH8901H"
+  },
+  {
+    "customer_id": "C009",
+    "email": "vikram.singh@gmail.com",
+    "name": "Vikram Singh",
+    "login_provider": "google",
+    "created_at": "2024-12-02T11:30:20Z",
+    "age": 42,
+    "city": "Gurgaon",
+    "monthly_salary": 125000,
+    "credit_score": 820,
+    "preapproved_limit": 350000,
+    "existing_loans": [
+      {
+        "type": "home",
+        "amount": 2500000,
+        "monthly_emi": 25000
+      }
+    ],
+    "bank_account": "3333444455",
+    "avg_balance": 120000,
+    "pan": "IIIPPI2345I"
+  },
+  {
+    "customer_id": "C010",
+    "email": "deepa.gupta@gmail.com",
+    "name": "Deepa Gupta",
+    "login_provider": "google",
+    "created_at": "2024-12-02T12:45:10Z",
+    "age": 27,
+    "city": "Ahmedabad",
+    "monthly_salary": 72000,
+    "credit_score": 685,
+    "preapproved_limit": 100000,
+    "existing_loans": [],
+    "bank_account": "6666777788",
+    "avg_balance": 28000,
+    "pan": "JJJPJ6789J"
   }
 ]

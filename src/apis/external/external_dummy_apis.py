@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
+
 from fastapi import FastAPI
 from .models import (
     PANRequest,
@@ -6,6 +10,12 @@ from .models import (
     BankStatementResponse,
     CreditScoreRequest,
     CreditScoreResponse,
+    CRMRequest,
+    CRMResponse,
+    eSignRequest,
+    eSignResponse,
+    DisbursementRequest,
+    DisbursementResponse,
     UnderwritingRequest,
     UnderwritingResponse,
     PricingRequest,
@@ -20,7 +30,7 @@ from pydantic import BaseModel, EmailStr
 
 import email_validator
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import json
 import re
@@ -219,6 +229,62 @@ def fetch_credit_score(
         credit_score=record["credit_score"],
         active_loans=record["active_loans"],
         late_payments=record["late_payments"]
+    )
+
+
+# =====================================================
+# CRM API
+# =====================================================
+
+@app.post(
+    "/crm/verify",
+    response_model=CRMResponse
+)
+def verify_crm_details(
+    data: CRMRequest
+):
+    """
+    Verify customer CRM details
+    (phone, address, city)
+    """
+
+    # Find customer in database
+    record = next(
+        (
+            item for item in CUSTOMER_DB
+            if item["customer_id"] == data.customer_id
+        ),
+        None
+    )
+
+    if not record:
+
+        return CRMResponse(
+            crm_verification_status="FAILED",
+            phone=None,
+            address=None,
+            city=None,
+            message="Customer not found in CRM"
+        )
+
+    # Check for blacklist
+    if record.get("blacklisted", False):
+
+        return CRMResponse(
+            crm_verification_status="FAILED",
+            phone=None,
+            address=None,
+            city=None,
+            message="Customer is blacklisted"
+        )
+
+    # Return verified details
+    return CRMResponse(
+        crm_verification_status="VERIFIED",
+        phone=record.get("phone"),
+        address=record.get("address"),
+        city=record.get("city"),
+        message="CRM details verified successfully"
     )
 
 
@@ -455,6 +521,103 @@ def calculate_pricing(
             2
         ),
         remarks="Loan pricing calculated successfully"
+    )
+
+
+# =====================================================
+# eSIGN API
+# =====================================================
+
+@app.post(
+    "/esign/sign",
+    response_model=eSignResponse
+)
+def sign_documents(
+    data: eSignRequest
+):
+    """
+    Digital signature service for loan documents
+    """
+
+    # Generate signature ID
+    signature_id = (
+        f"SIG-{uuid.uuid4().hex[:8].upper()}"
+    )
+
+    signed_at = datetime.now().strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    # Document list
+    documents = [
+        "sanction_letter.pdf",
+        "loan_agreement.pdf",
+        "terms_conditions.pdf"
+    ]
+
+    return eSignResponse(
+        sign_status="SIGNED",
+        signature_id=signature_id,
+        signed_at=signed_at,
+        documents=documents,
+        message="Documents signed successfully"
+    )
+
+
+# =====================================================
+# DISBURSEMENT API
+# =====================================================
+
+@app.post(
+    "/disbursement/process",
+    response_model=DisbursementResponse
+)
+def process_disbursement(
+    data: DisbursementRequest
+):
+    """
+    Process loan disbursement to customer account
+    """
+
+    # Validation
+    if not data.signature_id:
+
+        return DisbursementResponse(
+            disbursement_status="FAILED",
+            disbursement_id=None,
+            amount_disbursed=0,
+            processing_time=None,
+            bank_reference=None,
+            expected_credit_date=None,
+            message="Signature required for disbursement"
+        )
+
+    # Generate disbursement ID
+    disbursement_id = (
+        f"DISB-{uuid.uuid4().hex[:8].upper()}"
+    )
+
+    # Generate bank reference
+    bank_reference = (
+        f"REF-{uuid.uuid4().hex[:6].upper()}"
+    )
+
+    # Processing time (in hours)
+    processing_time = "1-2 business days"
+
+    # Expected credit date
+    expected_credit_date = (
+        datetime.now() + timedelta(days=2)
+    ).strftime("%Y-%m-%d")
+
+    return DisbursementResponse(
+        disbursement_status="SUCCESS",
+        disbursement_id=disbursement_id,
+        amount_disbursed=data.loan_amount,
+        processing_time=processing_time,
+        bank_reference=bank_reference,
+        expected_credit_date=expected_credit_date,
+        message=f"Loan of ₹{data.loan_amount:,.2f} will be credited to your account within {processing_time}"
     )
 
 
